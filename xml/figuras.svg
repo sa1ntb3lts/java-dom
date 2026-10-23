@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="391" height="391" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+        <circle id ="C1" cx="100" cy="50" r="60" stroke="red" stroke-width="2" fill="red"/>
+        <circle id ="C2" cx="100" cy="50" r="50" stroke="red" stroke-width="2" fill="red"/>
+        <circle  id ="C3" cx="100" cy="50" r="40" stroke="blue" stroke-width="2" fill="blue"/>
+        <circle id ="C4" cx="100" cy="50" r="30" stroke="green" stroke-width="2" fill="green"/>
+        <circle id ="C5" cx="100" cy="50" r="20" stroke="white" stroke-width="2" fill="white"/>
+
+        <rect id ="R1" x="10" y="75" width="640" height="480" stroke-width="2" fill="cyan"/>
+        <rect id ="R2" x="50" y="75" width="500" height="400" stroke-width="2" fill="red"/>
+        <rect id ="R3" x="50" y="75" width="400" height="300" stroke-width="2" fill="blue"/>
+        <rect id ="R4" x="50" y="75" width="300" height="200" stroke-width="2" fill="white"/>
+
+        <line id ="L1" x1="0" y1="0" x2="200" y2="200" stroke-width="2" stroke="red"  />
+        <line id ="L2" x1="0" y1="0" x2="100" y2="50" stroke-width="2"  stroke="red" />
+        <line id ="L3" x1="50" y1="50" x2="100" y2="50" stroke-width="2" stroke="red" />
+</svg>
