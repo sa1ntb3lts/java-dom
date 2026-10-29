@@ -7,11 +7,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.io.File;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class SVGParser {
+    private List<SVGElement> elements = new ArrayList<>();
+    private int canvasWidth = 500;
+    private int canvasHeight = 400;
 
     public void parseSVG(String filePath) {
+        elements.clear();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -24,8 +29,13 @@ public class SVGParser {
             doc.getDocumentElement().normalize();
 
             Element root = doc.getDocumentElement();
-            System.out.println("Raíz SVG: " + root.getNodeName());
-            System.out.println("Ancho: " + root.getAttribute("width") + ", Alto: " + root.getAttribute("height"));
+            
+            if (root.hasAttribute("width")) {
+                canvasWidth = Integer.parseInt(root.getAttribute("width").replaceAll("[^0-9]", ""));
+            }
+            if (root.hasAttribute("height")) {
+                canvasHeight = Integer.parseInt(root.getAttribute("height").replaceAll("[^0-9]", ""));
+            }
 
             parseNodes(root.getChildNodes());
 
@@ -41,56 +51,86 @@ public class SVGParser {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 String tagName = element.getTagName();
+                SVGElement svgElement = null;
 
                 switch (tagName) {
                     case "line":
-                        System.out.println("Elemento line -> x1: " + element.getAttribute("x1") +
-                                ", y1: " + element.getAttribute("y1") +
-                                ", x2: " + element.getAttribute("x2") +
-                                ", y2: " + element.getAttribute("y2") +
-                                ", stroke: " + element.getAttribute("stroke") +
-                                ", stroke-width: " + element.getAttribute("stroke-width"));
+                        svgElement = new LineElement(
+                            getDouble(element, "x1", 0),
+                            getDouble(element, "y1", 0),
+                            getDouble(element, "x2", 0),
+                            getDouble(element, "y2", 0)
+                        );
                         break;
                     case "circle":
-                        System.out.println("Elemento circle -> cx: " + element.getAttribute("cx") +
-                                ", cy: " + element.getAttribute("cy") +
-                                ", r: " + element.getAttribute("r") +
-                                ", fill: " + element.getAttribute("fill") +
-                                ", stroke: " + element.getAttribute("stroke"));
-                        break;
-                    case "polyline":
-                        System.out.println("Elemento polyline -> points: " + element.getAttribute("points") +
-                                ", stroke: " + element.getAttribute("stroke") +
-                                ", fill: " + element.getAttribute("fill"));
+                        svgElement = new CircleElement(
+                            getDouble(element, "cx", 0),
+                            getDouble(element, "cy", 0),
+                            getDouble(element, "r", 0)
+                        );
                         break;
                     case "rect":
-                        System.out.println("Elemento rect -> x: " + element.getAttribute("x") +
-                                ", y: " + element.getAttribute("y") +
-                                ", width: " + element.getAttribute("width") +
-                                ", height: " + element.getAttribute("height") +
-                                ", fill: " + element.getAttribute("fill"));
+                        svgElement = new RectElement(
+                            getDouble(element, "x", 0),
+                            getDouble(element, "y", 0),
+                            getDouble(element, "width", 0),
+                            getDouble(element, "height", 0)
+                        );
                         break;
                     case "ellipse":
-                        System.out.println("Elemento ellipse -> cx: " + element.getAttribute("cx") +
-                                ", cy: " + element.getAttribute("cy") +
-                                ", rx: " + element.getAttribute("rx") +
-                                ", ry: " + element.getAttribute("ry") +
-                                ", fill: " + element.getAttribute("fill"));
+                        svgElement = new EllipseElement(
+                            getDouble(element, "cx", 0),
+                            getDouble(element, "cy", 0),
+                            getDouble(element, "rx", 0),
+                            getDouble(element, "ry", 0)
+                        );
+                        break;
+                    case "polyline":
+                        svgElement = new PolylineElement(element.getAttribute("points"));
                         break;
                     case "text":
-                        System.out.println("Elemento text -> x: " + element.getAttribute("x") +
-                                ", y: " + element.getAttribute("y") +
-                                ", font-family: " + element.getAttribute("font-family") +
-                                ", font-size: " + element.getAttribute("font-size") +
-                                ", texto: " + element.getTextContent());
+                        svgElement = new TextElement(
+                            getDouble(element, "x", 0),
+                            getDouble(element, "y", 0),
+                            element.getTextContent(),
+                            element.getAttribute("font-family"),
+                            element.getAttribute("font-size")
+                        );
                         break;
                     case "g":
                         parseNodes(element.getChildNodes());
                         break;
-                    default:
-                        break;
+                }
+
+                if (svgElement != null) {
+                    svgElement.setStroke(element.getAttribute("stroke"));
+                    svgElement.setFill(element.getAttribute("fill"));
+                    svgElement.setStrokeWidth(element.getAttribute("stroke-width"));
+                    elements.add(svgElement);
                 }
             }
         }
+    }
+
+    private double getDouble(Element el, String attr, double defaultValue) {
+        String val = el.getAttribute(attr);
+        if (val == null || val.isEmpty()) return defaultValue;
+        try {
+            return Double.parseDouble(val.replaceAll("[^0-9.-]", ""));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public List<SVGElement> getElements() {
+        return elements;
+    }
+
+    public int getCanvasWidth() {
+        return canvasWidth;
+    }
+
+    public int getCanvasHeight() {
+        return canvasHeight;
     }
 }
