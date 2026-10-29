@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.io.File;
 
+
 public class SVGParser {
 
     public void parseSVG(String filePath) {
